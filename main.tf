@@ -44,7 +44,7 @@ EOF
 
 // Kubernetes Cluster
 module kubernetes {
-  source             = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubernetes?ref=v1.0.10"
+  source             = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubernetes?ref=feature/customizeWorkerGroupsLanuchTemplate"
   availability_zones = var.availability_zones
   environment        = var.environment
   project            = var.project
@@ -54,52 +54,15 @@ module kubernetes {
   subnets            = local.private_subnets
   aws_auth_user_mapping    = var.aws_auth_user_mapping
   aws_auth_role_mapping    = var.aws_auth_role_mapping
-  wait_for_cluster_interpreter = ["/bin/bash", "-c"]
+  wait_for_cluster_interpreter = var.wait_for_cluster_interpreter
 
   enable_irsa = var.enable_irsa
   enable_secret_encryption = var.enable_secret_encryption
 
   workers_additional_policies = concat([aws_iam_policy.worker_group_policy.arn], var.workers_additional_policies)
   
-  //spot
-  spot_max_cluster_size  = 5
-  spot_min_cluster_size  = 0
-  spot_desired_capacity  = 0
-  spot_instance_type  = ["m5.large", "m5.xlarge", "m5.2xlarge"]
-  spot_instance_pools  = 10
-  spot_asg_recreate_on_change  = false
-  spot_allocation_strategy  = "lowest-price"
-  spot_max_price  = ""
-
-  //common
-  on_demand_common_max_cluster_size  = 5
-  on_demand_common_min_cluster_size  = 0
-  on_demand_common_desired_capacity  = 1
-  on_demand_common_instance_type  =  ["m5.large", "m5.xlarge", "m5.2xlarge"]
-  on_demand_common_allocation_strategy  = "prioritized"
-  on_demand_common_base_capacity  = 0
-  on_demand_common_percentage_above_base_capacity  = 0
-  on_demand_common_asg_recreate_on_change  = false
-  
-  //cpu
-  on_demand_cpu_max_cluster_size  =  5
-  on_demand_cpu_min_cluster_size  =  0
-  on_demand_cpu_desired_capacity  =  0
-  on_demand_cpu_instance_type  =  ["c5.xlarge", "c5.2xlarge", "c5n.xlarge"]
-  on_demand_cpu_allocation_strategy  =  "prioritized"
-  on_demand_cpu_base_capacity  =  0
-  on_demand_cpu_percentage_above_base_capacity  =  0
-  on_demand_cpu_asg_recreate_on_change  =  false
-
-  //gpu
-  on_demand_gpu_max_cluster_size  = 5
-  on_demand_gpu_min_cluster_size  = 0
-  on_demand_gpu_desired_capacity  = 0
-  on_demand_gpu_instance_type  = ["p2.xlarge", "g4dn.xlarge", "p3.2xlarge"]
-  on_demand_gpu_allocation_strategy  = "prioritized"
-  on_demand_gpu_base_capacity  =  0
-  on_demand_gpu_percentage_above_base_capacity  =  0
-  on_demand_gpu_asg_recreate_on_change  =  false
+  worker_groups = var.worker_groups
+  worker_groups_launch_template = var.worker_groups_launch_template
 
   tags = var.tags
 
