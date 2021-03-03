@@ -1,7 +1,7 @@
 
 module network {
   count = var.vpc_id == null ? 1 : 0
-  source             = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/network?ref=v1.0.10"
+  source             = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/network?ref=feature/customizeWorkerGroupsLanuchTemplate"
   availability_zones = var.availability_zones
   environment        = var.environment
   project            = var.project
