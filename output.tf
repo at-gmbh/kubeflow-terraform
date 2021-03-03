@@ -3,9 +3,9 @@ output argocd_state {
 }
 
 output "vpc_id" {
-  value = module.network.vpc_id
+  value = local.vpc_id
 }
 
 output "private_subnets" {
-  value = module.network.private_subnets
+  value = local.private_subnets
 }
