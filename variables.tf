@@ -329,8 +329,6 @@ variable "rds_database_tags" {
   type        = map(string)
 }
 
-
-
 variable "rds_iam_database_authentication_enabled" {
   default     = false
   description = "Set to true to authenticate to RDS using an IAM role"
@@ -348,7 +346,6 @@ variable "rds_instance_name" {
   type        = string
 }
 
-
 variable "rds_publicly_accessible" {
   description = "Set to true to enable accessing the RDS DB from outside the VPC"
   default = false
@@ -359,4 +356,22 @@ variable "workers_additional_policies" {
   type  = list
   default = []
   description = "List of ARNs of additional policies to attach to workers"
+}
+
+variable "wait_for_cluster_interpreter" {
+  type = list
+  default = ["/bin/bash", "-c"]
+  description = "Interpreter in which to run 'wait for cluster' command"
+}
+
+variable "worker_groups" {
+  description = "A list of maps defining worker group configurations to be defined using AWS Launch Templates. See workers_group_defaults_defaults in https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/local.tf"
+  type        = any
+  default     = []
+}
+
+variable "worker_groups_launch_template" {
+  description = "A list of maps defining worker group configurations to be defined using AWS Launch Templates. See workers_group_defaults_defaults in https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/local.tf"
+  type        = any
+  default     = []
 }
