@@ -325,6 +325,7 @@ module external_secrets {
   source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/external-secrets?ref=hotfix/eks_cluster"
   argocd = module.argocd.state  
   cluster_name = var.cluster_name
+  cluster_oidc_url = module.kubernetes.cluster_oidc_url
 
   // Set to false create and attach role to external_secrets service account that has no policies attached to it. This role will then be used to assume other role with fine granular access. This is the recommended approach
   // Set to true to with the external_secrets service account full access to all secrets prefixed with the cluster name. This is more convenient but less secure.
