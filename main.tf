@@ -489,7 +489,7 @@ spec:
       name: aws-istio-authz-adaptor
   repos:
     - name: manifests
-      uri: 'https://github.com/at-gmbh/manifests/archive/${var.kubeflow_manifests_release}.tar.gz'
+      uri: 'https://github.com/at-gmbh/manifests/archive/${var.kubeflow_manifests_tag}.tar.gz'
   version: ${var.kubeflow_manifests_branch}
 EOT
  

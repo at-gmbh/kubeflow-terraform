@@ -122,7 +122,7 @@ variable kubeflow_manifests_branch {
   type = string
 }
 
-variable kubeflow_manifests_release {
+variable kubeflow_manifests_tag {
   type = string
 }
 
