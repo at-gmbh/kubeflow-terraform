@@ -70,15 +70,26 @@ module kubernetes {
 
 
 
+// ACM certificate for load balancer
+
 locals {
-  loadbalancer_acm_arn = var.loadbalancer_acm_arn == "" ? module.acm[0].this_acm_certificate_arn : var.loadbalancer_acm_arn
+  create_acm_certificate = var.loadbalancer_acm_arn == "" && !var.self_sign_acm_certificate
+  create_self_signed_acm_certificate = var.loadbalancer_acm_arn == "" && var.self_sign_acm_certificate      
+
+  //if ARN of existing certificate provided, use that. If not either create a normal ACM certificate, or create a self-signed one
+  loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn : (local.create_acm_certificate ? module.acm[0].this_acm_certificate_arn : aws_acm_certificate.self_signed_cert.arn)
+
+  external_secrets_deployment_role_arn = var.secret_manager_assume_from_node_role ? module.kubernetes.worker_iam_role_arn : module.external_secrets.external_secrets_role_arn
 }
+
+# create new
 module acm {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
 
+  //create_certificate = local.create_acm_certificate
   
-  count = var.loadbalancer_acm_arn == "" ? 1 : 0 //only create if an existing ACM certificate hasn't been provided
+  count = local.create_acm_certificate ? 1 : 0 //only create if an existing ACM certificate hasn't been provided and not creating a self-signed cert
 
 
   domain_name               = var.domain
@@ -89,6 +100,39 @@ module acm {
 }
 
 
+# import existing
+resource "tls_private_key" "self_signed_cert" {
+  count = local.create_acm_certificate ? 1 : 0
+  algorithm = "RSA"
+}
+
+resource "tls_self_signed_cert" "self_signed_cert" {
+  count = local.create_acm_certificate ? 1 : 0
+  key_algorithm   = "RSA"
+  private_key_pem = tls_private_key.example.private_key_pem
+
+  subject {
+    common_name  = "example.com" //TODO might have to set this
+    organization = "ACME Examples, Inc" //TODO might have to set this
+  }
+
+  validity_period_hours = 24000 //1000 days
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
+  ]
+}
+
+resource "aws_acm_certificate" "self_signed_cert" {
+  count = local.create_acm_certificate ? 1 : 0
+  private_key      = tls_private_key.example.private_key_pem
+  certificate_body = tls_self_signed_cert.example.cert_pem
+}
+
+
+
 // Create Cognito User Pool
 module cognito {
   source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/user-pool?ref=v1.0.12"
@@ -96,6 +140,7 @@ module cognito {
   zone_id      = module.external_dns.zone_id
   cluster_name = module.kubernetes.cluster_name
   acm_arn      = var.cognito_acm_arn
+  self_sign_acm_certificate = var.self_sign_acm_certificate
   tags         = var.tags
   invite_template = {
     email_subject = "You've been invited to https://${var.cognito_callback_prefix_kubeflow}.${var.domain}"

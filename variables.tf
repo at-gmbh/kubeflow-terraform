@@ -57,6 +57,12 @@ variable enable_secret_encryption {
   default     = false
 }
 
+variable self_sign_acm_certificate {
+  type        = bool
+  description = "Set to true in order to create a self-signed ACM certificates instead of letting ACM create and validate them"
+  default     = false
+}
+
 variable "secret_manager_full_access" {
   default     = false
   description = <<EOT
