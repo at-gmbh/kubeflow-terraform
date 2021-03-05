@@ -73,7 +73,7 @@ module kubernetes {
 // ACM certificate for load balancer
 
 locals {
-  create_acm_certificate = var.loadbalancer_acm_arn == "" && !var.self_sign_acm_certificate
+  create_acm_certificate = true # var.loadbalancer_acm_arn == "" && !var.self_sign_acm_certificate
   create_self_signed_acm_certificate = var.loadbalancer_acm_arn == "" && var.self_sign_acm_certificate      
 
   //if ARN of existing certificate provided, use that. If not either create a normal ACM certificate, or create a self-signed one
