@@ -77,12 +77,12 @@ locals {
   create_self_signed_acm_certificate = var.loadbalancer_acm_arn == "" && var.self_sign_acm_certificate      
 
   //if ARN of existing certificate provided, use that. If not either create a normal ACM certificate, or create a self-signed one
-  loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn : (local.create_acm_certificate ? module.acm[0].this_acm_certificate_arn : aws_acm_certificate.self_signed_cert.arn)
+  loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn : (local.create_acm_certificate ? module.acm[0].this_acm_certificate_arn : aws_acm_certificate.self_signed_cert[0].arn)
 
   external_secrets_deployment_role_arn = var.secret_manager_assume_from_node_role ? module.kubernetes.worker_iam_role_arn : module.external_secrets.external_secrets_role_arn
 }
 
-# create new
+# create normal certifcate
 module acm {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
@@ -100,7 +100,7 @@ module acm {
 }
 
 
-# import existing
+# self-signed certificate
 resource "tls_private_key" "self_signed_cert" {
   count = local.create_acm_certificate ? 1 : 0
   algorithm = "RSA"
@@ -109,7 +109,7 @@ resource "tls_private_key" "self_signed_cert" {
 resource "tls_self_signed_cert" "self_signed_cert" {
   count = local.create_acm_certificate ? 1 : 0
   key_algorithm   = "RSA"
-  private_key_pem = tls_private_key.example.private_key_pem
+  private_key_pem = tls_private_key.self_signed_cert[0].private_key_pem
 
   subject {
     common_name  = "example.com" //TODO might have to set this
@@ -127,8 +127,8 @@ resource "tls_self_signed_cert" "self_signed_cert" {
 
 resource "aws_acm_certificate" "self_signed_cert" {
   count = local.create_acm_certificate ? 1 : 0
-  private_key      = tls_private_key.example.private_key_pem
-  certificate_body = tls_self_signed_cert.example.cert_pem
+  private_key      = tls_private_key.self_signed_cert[0].private_key_pem
+  certificate_body = tls_self_signed_cert.self_signed_cert[0].cert_pem
 }
 
 
