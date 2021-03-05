@@ -80,10 +80,11 @@ locals {
   # loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn :
   #                                                       (local.create_acm_certificate ? module.acm[0].this_acm_certificate_arn : aws_acm_certificate.self_signed_cert[0].arn)
 
-  loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn :
-                                                                                  (var.self_sign_acm_certificate ?
-                                                                                  aws_acm_certificate.self_signed_cert[0].arn :
-                                                                                  module.acm[0].this_acm_certificate_arn)
+  loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ?
+  var.loadbalancer_acm_arn :
+  (var.self_sign_acm_certificate ?
+  aws_acm_certificate.self_signed_cert[0].arn :
+  module.acm[0].this_acm_certificate_arn)
 
 
 
