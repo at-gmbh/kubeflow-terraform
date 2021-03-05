@@ -82,11 +82,9 @@ locals {
 
   loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn : (var.self_sign_acm_certificate ? aws_acm_certificate.self_signed_cert[0].arn : module.acm[0].this_acm_certificate_arn)
 
-
-
   external_secrets_deployment_role_arn = var.secret_manager_assume_from_node_role ? module.kubernetes.worker_iam_role_arn : module.external_secrets.external_secrets_role_arn
 
-  # depends_on = [aws_acm_certificate.self_signed_cert[0]]
+  depends_on = [aws_acm_certificate.self_signed_cert[0]]
 
 }
 
