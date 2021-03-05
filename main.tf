@@ -73,11 +73,19 @@ module kubernetes {
 // ACM certificate for load balancer
 
 locals {
-  create_acm_certificate = true # var.loadbalancer_acm_arn == "" && !var.self_sign_acm_certificate
-  create_self_signed_acm_certificate = var.loadbalancer_acm_arn == "" && var.self_sign_acm_certificate      
+  # create_acm_certificate = var.loadbalancer_acm_arn == "" && !var.self_sign_acm_certificate
+  create_self_signed_acm_certificate = var.loadbalancer_acm_arn == "" && var.self_sign_acm_certificate
 
   //if ARN of existing certificate provided, use that. If not either create a normal ACM certificate, or create a self-signed one
-  loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn : (local.create_acm_certificate ? module.acm[0].this_acm_certificate_arn : aws_acm_certificate.self_signed_cert[0].arn)
+  # loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn :
+  #                                                       (local.create_acm_certificate ? module.acm[0].this_acm_certificate_arn : aws_acm_certificate.self_signed_cert[0].arn)
+
+  loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn :
+                                                                                  (var.self_sign_acm_certificate ?
+                                                                                  aws_acm_certificate.self_signed_cert[0].arn :
+                                                                                  module.acm[0].this_acm_certificate_arn)
+
+
 
   external_secrets_deployment_role_arn = var.secret_manager_assume_from_node_role ? module.kubernetes.worker_iam_role_arn : module.external_secrets.external_secrets_role_arn
 
