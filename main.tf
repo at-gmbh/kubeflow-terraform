@@ -111,7 +111,7 @@ resource "tls_self_signed_cert" "self_signed_cert" {
   private_key_pem = tls_private_key.self_signed_cert[0].private_key_pem
 
   subject {
-    common_name  = "example.com" //TODO might have to set this
+    common_name  = "learn-mlops.com" //TODO might have to set this
     organization = "ACME Examples, Inc" //TODO might have to set this
   }
 
