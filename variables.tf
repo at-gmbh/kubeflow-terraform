@@ -366,7 +366,7 @@ variable "workers_additional_policies" {
 
 variable "wait_for_cluster_interpreter" {
   type = list
-  default = ["/bin/bash", "-c"]
+  default = ["/bin/sh", "-c"]
   description = "Interpreter in which to run 'wait for cluster' command"
 }
 
