@@ -72,24 +72,13 @@ module kubernetes {
 
 // ACM certificate for load balancer
 
-locals {
-
-  create_self_signed_acm_certificate = var.loadbalancer_acm_arn == "" && var.self_sign_acm_certificate
-  create_acm_certificate = !local.create_self_signed_acm_certificate
-
-  loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn : (var.self_sign_acm_certificate ? aws_acm_certificate.self_signed_cert[0].arn : module.acm[0].this_acm_certificate_arn)
-
-  external_secrets_deployment_role_arn = var.secret_manager_assume_from_node_role ? module.kubernetes.worker_iam_role_arn : module.external_secrets.external_secrets_role_arn
-
-  depends_on = [aws_acm_certificate.self_signed_cert[0]]
-
-}
-
 # create normal certifcate
 module acm {
   source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/acm/?ref=feature/self_signed_cert"
 
-  create_certificate        = local.create_acm_certificate ? true : false  //only create if an existing ACM certificate hasn't been provided and not creating a self-signed cert
+  # create_certificate        = local.create_acm_certificate ? true : false  //only create if an existing ACM certificate hasn't been provided and not creating a self-signed cert
+  loadbalancer_acm_arn      = var.loadbalancer_acm_arn
+  self_sign_acm_certificate = var.self_sign_acm_certificate
   domain_name               = var.domain
   subject_alternative_names = ["*.${var.domain}"]
   zone_id                   = module.external_dns.zone_id
@@ -99,36 +88,6 @@ module acm {
 }
 
 
-# self-signed certificate
-resource "tls_private_key" "self_signed_cert" {
-  count = local.create_self_signed_acm_certificate ? 1 : 0
-  algorithm = "RSA"
-}
-
-resource "tls_self_signed_cert" "self_signed_cert" {
-  count = local.create_self_signed_acm_certificate ? 1 : 0
-  key_algorithm   = "RSA"
-  private_key_pem = tls_private_key.self_signed_cert[0].private_key_pem
-
-  subject {
-    common_name  = "learn-mlops.com" //TODO might have to set this
-    organization = "ACME Examples, Inc" //TODO might have to set this
-  }
-
-  validity_period_hours = 24000 //1000 days
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
-  ]
-}
-
-resource "aws_acm_certificate" "self_signed_cert" {
-  count = local.create_self_signed_acm_certificate ? 1 : 0
-  private_key      = tls_private_key.self_signed_cert[0].private_key_pem
-  certificate_body = tls_self_signed_cert.self_signed_cert[0].cert_pem
-}
 
 
 
@@ -309,7 +268,7 @@ module argocd {
   ingress_annotations = {
     "kubernetes.io/ingress.class"               = "alb"
     "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
-    "alb.ingress.kubernetes.io/certificate-arn" = local.loadbalancer_acm_arn
+    "alb.ingress.kubernetes.io/certificate-arn" = module.acm.loadbalancer_acm_arn
     "alb.ingress.kubernetes.io/listen-ports" = jsonencode(
       [{ "HTTPS" = 443 }]
     )
@@ -405,7 +364,7 @@ module kubeflow {
   ingress_annotations = {
     "kubernetes.io/ingress.class"               = "alb"
     "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
-    "alb.ingress.kubernetes.io/certificate-arn" = local.loadbalancer_acm_arn
+    "alb.ingress.kubernetes.io/certificate-arn" = module.acm.loadbalancer_acm_arn
     "alb.ingress.kubernetes.io/auth-type"       = "cognito"
     "alb.ingress.kubernetes.io/auth-idp-cognito" = jsonencode({
       "UserPoolArn"      = module.cognito.pool_arn
@@ -535,7 +494,7 @@ module alb_ingress {
   cluster_name      = module.kubernetes.cluster_name
   domains           = [var.domain]
   vpc_id            = local.vpc_id
-  certificates_arns = [local.loadbalancer_acm_arn]
+  certificates_arns = [module.acm.loadbalancer_acm_arn]
   argocd            = module.argocd.state
 }
 
