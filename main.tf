@@ -75,7 +75,7 @@ module kubernetes {
 locals {
 
   create_self_signed_acm_certificate = var.loadbalancer_acm_arn == "" && var.self_sign_acm_certificate
-  create_acm_certificate = !create_self_signed_acm_certificate
+  create_acm_certificate = !local.create_self_signed_acm_certificate
 
   loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn : (var.self_sign_acm_certificate ? aws_acm_certificate.self_signed_cert[0].arn : module.acm[0].this_acm_certificate_arn)
 
