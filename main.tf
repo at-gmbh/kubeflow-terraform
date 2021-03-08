@@ -89,7 +89,7 @@ locals {
 module acm {
   source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/acm/?ref=feature/self_signed_cert"
 
-  count = local.create_acm_certificate ? true : false  //only create if an existing ACM certificate hasn't been provided and not creating a self-signed cert
+  create_certificate        = local.create_acm_certificate ? true : false  //only create if an existing ACM certificate hasn't been provided and not creating a self-signed cert
   domain_name               = var.domain
   subject_alternative_names = ["*.${var.domain}"]
   zone_id                   = module.external_dns.zone_id
