@@ -359,13 +359,13 @@ variable "rds_publicly_accessible" {
 }
 
 variable "workers_additional_policies" {
-  type  = list
+  type    = list(string)
   default = []
   description = "List of ARNs of additional policies to attach to workers"
 }
 
 variable "wait_for_cluster_interpreter" {
-  type = list
+  type    = list(string)
   default = ["/bin/sh", "-c"]
   description = "Interpreter in which to run 'wait for cluster' command"
 }
