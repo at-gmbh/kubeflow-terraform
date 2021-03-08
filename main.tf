@@ -73,12 +73,9 @@ module kubernetes {
 // ACM certificate for load balancer
 
 locals {
-  create_acm_certificate = var.loadbalancer_acm_arn == "" && !var.self_sign_acm_certificate
-  create_self_signed_acm_certificate = var.loadbalancer_acm_arn == "" && var.self_sign_acm_certificate
 
-  //if ARN of existing certificate provided, use that. If not either create a normal ACM certificate, or create a self-signed one
-  # loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn :
-  #                                                       (local.create_acm_certificate ? module.acm[0].this_acm_certificate_arn : aws_acm_certificate.self_signed_cert[0].arn)
+  create_self_signed_acm_certificate = var.loadbalancer_acm_arn == "" && var.self_sign_acm_certificate
+  create_acm_certificate = !create_self_signed_acm_certificate
 
   loadbalancer_acm_arn = var.loadbalancer_acm_arn != "" ? var.loadbalancer_acm_arn : (var.self_sign_acm_certificate ? aws_acm_certificate.self_signed_cert[0].arn : module.acm[0].this_acm_certificate_arn)
 
@@ -93,8 +90,6 @@ module acm {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
 
-  //create_certificate = local.create_acm_certificate
-  
   count = local.create_acm_certificate ? 1 : 0 //only create if an existing ACM certificate hasn't been provided and not creating a self-signed cert
 
 
