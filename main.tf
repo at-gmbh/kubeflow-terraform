@@ -73,18 +73,17 @@ module kubernetes {
 // ACM certificate for load balancer
 
 # create normal certifcate
-module acm {
-  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/acm/?ref=feature/self_signed_cert"
+module acm_certificate {
+  source                    = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/acm-certificate/?ref=feature/self_signed_cert"
 
   # create_certificate        = local.create_acm_certificate ? true : false  //only create if an existing ACM certificate hasn't been provided and not creating a self-signed cert
-  loadbalancer_acm_arn      = var.loadbalancer_acm_arn
+  existing_acm_arn          = var.loadbalancer_acm_arn
   self_sign_acm_certificate = var.self_sign_acm_certificate
   domain_name               = var.domain
   subject_alternative_names = ["*.${var.domain}"]
   zone_id                   = module.external_dns.zone_id
   validate_certificate      = var.aws_private == false ? true : false
   tags                      = var.tags
-
 }
 
 
@@ -268,7 +267,7 @@ module argocd {
   ingress_annotations = {
     "kubernetes.io/ingress.class"               = "alb"
     "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
-    "alb.ingress.kubernetes.io/certificate-arn" = module.acm.loadbalancer_acm_arn
+    "alb.ingress.kubernetes.io/certificate-arn" = module.acm_certificate.loadbalancer_acm_arn
     "alb.ingress.kubernetes.io/listen-ports" = jsonencode(
       [{ "HTTPS" = 443 }]
     )
@@ -364,7 +363,7 @@ module kubeflow {
   ingress_annotations = {
     "kubernetes.io/ingress.class"               = "alb"
     "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
-    "alb.ingress.kubernetes.io/certificate-arn" = module.acm.loadbalancer_acm_arn
+    "alb.ingress.kubernetes.io/certificate-arn" = module.acm_certificate.loadbalancer_acm_arn
     "alb.ingress.kubernetes.io/auth-type"       = "cognito"
     "alb.ingress.kubernetes.io/auth-idp-cognito" = jsonencode({
       "UserPoolArn"      = module.cognito.pool_arn
@@ -494,7 +493,7 @@ module alb_ingress {
   cluster_name      = module.kubernetes.cluster_name
   domains           = [var.domain]
   vpc_id            = local.vpc_id
-  certificates_arns = [module.acm.loadbalancer_acm_arn]
+  certificates_arns = [module.acm_certificate.loadbalancer_acm_arn]
   argocd            = module.argocd.state
 }
 
