@@ -267,7 +267,7 @@ module argocd {
   ingress_annotations = {
     "kubernetes.io/ingress.class"               = "alb"
     "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
-    "alb.ingress.kubernetes.io/certificate-arn" = module.acm_certificate.loadbalancer_acm_arn
+    "alb.ingress.kubernetes.io/certificate-arn" = module.acm_certificate.arn
     "alb.ingress.kubernetes.io/listen-ports" = jsonencode(
       [{ "HTTPS" = 443 }]
     )
@@ -363,7 +363,7 @@ module kubeflow {
   ingress_annotations = {
     "kubernetes.io/ingress.class"               = "alb"
     "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
-    "alb.ingress.kubernetes.io/certificate-arn" = module.acm_certificate.loadbalancer_acm_arn
+    "alb.ingress.kubernetes.io/certificate-arn" = module.acm_certificate.arn
     "alb.ingress.kubernetes.io/auth-type"       = "cognito"
     "alb.ingress.kubernetes.io/auth-idp-cognito" = jsonencode({
       "UserPoolArn"      = module.cognito.pool_arn
@@ -493,7 +493,7 @@ module alb_ingress {
   cluster_name      = module.kubernetes.cluster_name
   domains           = [var.domain]
   vpc_id            = local.vpc_id
-  certificates_arns = [module.acm_certificate.loadbalancer_acm_arn]
+  certificates_arns = [module.acm_certificate.arn]
   argocd            = module.argocd.state
 }
 
