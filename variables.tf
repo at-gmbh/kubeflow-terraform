@@ -26,7 +26,7 @@ variable vpc_id {
   default = null
 }
 
-variable loadbalancer_acm_arn {
+variable acm_arn {
   type = string
   description = "The ARN of an ACM certificate to attach to the Load Balancer"
   default = ""

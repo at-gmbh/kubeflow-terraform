@@ -77,7 +77,7 @@ module acm_certificate {
   source                    = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/acm-certificate/?ref=feature/self_signed_cert"
 
   # create_certificate        = local.create_acm_certificate ? true : false  //only create if an existing ACM certificate hasn't been provided and not creating a self-signed cert
-  existing_acm_arn          = var.loadbalancer_acm_arn
+  existing_acm_arn          = var.acm_arn
   self_sign_acm_certificate = var.self_sign_acm_certificate
   domain_name               = var.domain
   subject_alternative_names = ["*.${var.domain}"]
