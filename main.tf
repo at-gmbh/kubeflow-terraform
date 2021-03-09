@@ -149,7 +149,7 @@ module cognito_users {
 
 // Create RDS instance
 module "rds" {
-  source  = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/rds?ref=v1.0.12"
+  source  = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/rds?ref=feature/optionGroupParam"
 
   environment  = var.environment
   project      = var.project
