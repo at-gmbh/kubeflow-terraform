@@ -38,6 +38,12 @@ variable cognito_acm_arn {
   default = ""
 }
 
+variable cognito_mfa_configuration {
+  type        = string
+  description = "Turn MFA on or off. (Must be on of: ON, OFF, OPTIONAL)"
+  default     = "ON"
+}
+
 variable private_subnets {
   type = list(any)
   description = "A list of private subnets within the existing VPC"
@@ -173,10 +179,11 @@ variable kubeflow_profiles {
 variable kubeflow_cognito_users {
   description = "A mapping of users to groups, with unique hashes "
   type = list(object({
-    username    = string
-    email       = string
-    group       = string //TODO current this entry will have no effect. All users are assigned to "default"
-    user_hash   = string // a unique has representation of the user. Must be alphanumeric and max 64 chars. For example sha("user@${username}").
+    username        = string
+    email           = string
+    phone_number    = string
+    group           = string //TODO current this entry will have no effect. All users are assigned to "default"
+    user_hash       = string // a unique has representation of the user. Must be alphanumeric and max 64 chars. For example sha("user@${username}").
     user_group_hash = string // a unique has representation of the user. Must be alphanumeric and max 64 chars. For example sha("user-group@${username}"). Must differ from user_hash as each must be unique
   }))
   default = []
