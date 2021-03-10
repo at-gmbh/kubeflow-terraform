@@ -96,7 +96,6 @@ module cognito {
   zone_id      = module.external_dns.zone_id
   cluster_name = module.kubernetes.cluster_name
   acm_arn      = var.cognito_acm_arn
-  self_sign_acm_certificate = var.self_sign_acm_certificate
   tags         = var.tags
   invite_template = {
     email_subject = "You've been invited to https://${var.cognito_callback_prefix_kubeflow}.${var.domain}"
