@@ -117,6 +117,7 @@ resource aws_cognito_user_pool_client kubeflow {
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["email", "openid", "profile", "aws.cognito.signin.user.admin"]
   allowed_oauth_flows                  = ["code"]
+  read_attributes                      = ["email", "phone_number"]
   supported_identity_providers         = ["COGNITO"]
   generate_secret                      = true
 
