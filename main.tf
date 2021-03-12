@@ -139,7 +139,7 @@ resource aws_cognito_user_pool_client argocd {
 
 // Create Cognito Users
 module cognito_users {
-  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/users?ref=v1.0.15"
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/users?ref=feature/pod_defaults"
   cloudformation_stack_name = "${var.cluster_name}-cognito-users"
   pool_id  = module.cognito.pool_id
   user_groups = ["default"] //TODO
