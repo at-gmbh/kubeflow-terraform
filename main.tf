@@ -91,7 +91,7 @@ module acm_certificate {
 
 // Create Cognito User Pool
 module cognito {
-  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/user-pool?ref=v1.0.15"
+  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/user-pool?ref=feature/pod_defaults"
   domain       = var.domain //TODO make "auth" parameterisable? Currently it is hardcode in the "cognito" module
   zone_id      = module.external_dns.zone_id
   cluster_name = module.kubernetes.cluster_name
