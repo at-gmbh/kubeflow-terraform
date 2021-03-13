@@ -315,6 +315,7 @@ module profiles {
 module kubeflow-pod-default {
   source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-pod-default?ref=feature/pod_defaults"
   external_secrets_deployment_role_arn = local.external_secrets_deployment_role_arn
+  cluster_name = var.cluster_name
 }
 
 // Create YAML specs for kube2iam
