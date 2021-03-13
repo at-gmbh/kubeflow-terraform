@@ -306,10 +306,16 @@ module mlflow {
 }
 
 // Create YAML specs for Kubeflow Profiles
+module kubeflow-pod-default {
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-pod-default?ref=feature/pod_defaults"
+  external_secrets_deployment_role_arn = local.external_secrets_deployment_role_arn
+}
+
+// Create Poddefaults for Kubeflow Notebooks
 module profiles {
   source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-profiles?ref=feature/pod_defaults"
-  argocd = module.argocd.state
-  profiles = var.kubeflow_profiles
+  cluster_name = module.kubernetes.cluster_name
+  
 }
 
 // Create YAML specs for kube2iam
