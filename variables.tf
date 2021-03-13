@@ -188,6 +188,16 @@ variable kubeflow_cognito_users {
   default = []
 }
 
+variable "kubeflow_pod-defaults" {
+  description = "Adds values to PodDefaults to individual namespaces"
+  type = list(object({
+    namespace  = string
+    secret = string
+    name   = string
+  }))
+  default = []
+}
+
 variable aws_private {
   type = bool
   default = false

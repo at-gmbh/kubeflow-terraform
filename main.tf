@@ -317,6 +317,7 @@ module kubeflow-pod-default {
   external_secrets_deployment_role_arn = local.external_secrets_deployment_role_arn
   cluster_name = var.cluster_name
   argocd = module.argocd.state
+  kubeflow_pod-defaults    = var.kubeflow_pod-defaults
 }
 
 // Create YAML specs for kube2iam
