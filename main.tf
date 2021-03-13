@@ -91,7 +91,7 @@ module acm_certificate {
 
 // Create Cognito User Pool
 module cognito {
-  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/user-pool?ref=v1.0.15"
+  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/user-pool?ref=feature/pod_defaults"
   domain       = var.domain //TODO make "auth" parameterisable? Currently it is hardcode in the "cognito" module
   zone_id      = module.external_dns.zone_id
   cluster_name = module.kubernetes.cluster_name
@@ -117,6 +117,8 @@ resource aws_cognito_user_pool_client kubeflow {
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["email", "openid", "profile", "aws.cognito.signin.user.admin"]
   allowed_oauth_flows                  = ["code"]
+  read_attributes                      = ["phone_number"] #TODO Jay - MFA
+  write_attributes                     = ["phone_number"]
   supported_identity_providers         = ["COGNITO"]
   generate_secret                      = true
 
@@ -131,6 +133,8 @@ resource aws_cognito_user_pool_client argocd {
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["openid", "profile", "email"]
   allowed_oauth_flows                  = ["code"]
+  read_attributes                      = ["phone_number"] #TODO Jay - MFA
+  write_attributes                     = ["phone_number"]
   supported_identity_providers         = ["COGNITO"]
   generate_secret                      = true
 
@@ -139,7 +143,7 @@ resource aws_cognito_user_pool_client argocd {
 
 // Create Cognito Users
 module cognito_users {
-  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/users?ref=v1.0.15"
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/users?ref=feature/pod_defaults"
   cloudformation_stack_name = "${var.cluster_name}-cognito-users"
   pool_id  = module.cognito.pool_id
   user_groups = ["default"] //TODO
@@ -303,7 +307,7 @@ module mlflow {
 
 // Create YAML specs for Kubeflow Profiles
 module profiles {
-  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-profiles?ref=v1.0.15"
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-profiles?ref=feature/pod_defaults"
   argocd = module.argocd.state
   profiles = var.kubeflow_profiles
 }
