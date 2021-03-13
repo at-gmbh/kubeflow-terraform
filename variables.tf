@@ -190,7 +190,7 @@ variable kubeflow_cognito_users {
 
 variable "kubeflow_pod-defaults" {
   description = "Adds values to PodDefaults to individual namespaces"
-  type = list(object({
+  type = set(object({
     namespace  = string
     secret = string
     name   = string
