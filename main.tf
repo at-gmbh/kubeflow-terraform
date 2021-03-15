@@ -117,8 +117,7 @@ resource aws_cognito_user_pool_client kubeflow {
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["email", "openid", "profile", "aws.cognito.signin.user.admin"]
   allowed_oauth_flows                  = ["code"]
-  read_attributes                      = ["phone_number"] #TODO Jay - MFA
-  write_attributes                     = ["phone_number"]
+  read_attributes                      = ["email", "email_verified", "preferred_username"] #TODO Jay - MFA
   supported_identity_providers         = ["COGNITO"]
   generate_secret                      = true
 
@@ -133,8 +132,7 @@ resource aws_cognito_user_pool_client argocd {
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["openid", "profile", "email"]
   allowed_oauth_flows                  = ["code"]
-  read_attributes                      = ["phone_number"] #TODO Jay - MFA
-  write_attributes                     = ["phone_number"]
+  read_attributes                      = ["email", "email_verified", "preferred_username"] #TODO Jay - MFA
   supported_identity_providers         = ["COGNITO"]
   generate_secret                      = true
 
